@@ -1618,13 +1618,17 @@ void S9xExit (void)
 	exit(0);
 }
 
-#ifdef DEBUGGER
+extern bool S9xShouldExit;
+
 static void sigbrkhandler (int)
 {
+#ifdef DEBUGGER
 	CPU.Flags |= DEBUG_MODE_FLAG;
+#else
+	S9xShouldExit = true;
+#endif
 	signal(SIGINT, (SIG_PF) sigbrkhandler);
 }
-#endif
 
 int main (int argc, char **argv)
 {
@@ -1784,7 +1788,6 @@ int main (int argc, char **argv)
 	CPU.Flags = saved_flags;
 	Settings.StopEmulation = FALSE;
 
-#ifdef DEBUGGER
 	struct sigaction sa;
 	sa.sa_handler = sigbrkhandler;
 #ifdef SA_RESTART
@@ -1794,7 +1797,6 @@ int main (int argc, char **argv)
 #endif
 	sigemptyset(&sa.sa_mask);
 	sigaction(SIGINT, &sa, NULL);
-#endif
 
 	S9xInitInputDevices();
 	S9xInitDisplay(argc, argv);

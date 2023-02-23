@@ -200,6 +200,8 @@ void S9xStartScreenRefresh (void)
 	IPPU.TotalEmulatedFrames++;
 }
 
+bool S9xShouldExit = false;
+
 void S9xEndScreenRefresh (void)
 {
 	if (IPPU.RenderThisFrame)
@@ -272,6 +274,11 @@ void S9xEndScreenRefresh (void)
 
 	if (GFX.EndScreenRefreshCallback)
 		GFX.EndScreenRefreshCallback(GFX.EndScreenRefreshCallbackData);
+	if (S9xShouldExit)
+	{
+		S9xExit();
+		S9xShouldExit = false;
+	}
 }
 
 void S9xSetEndScreenRefreshCallback(const SGFX::Callback cb, void *const data)
